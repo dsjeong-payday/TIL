@@ -24,7 +24,7 @@
 
 
 # 「개인정보보호법」
-## 법 제26조: 개인정보 처리 업무 위탁
+## 법 제26조(업무위탁에 따른 개인정보의 처리 제한)
 - 법 제26조는 개인정보처리자(=위탁자)가 제3자(=수탁자)에게 개인정보 처리 업무를 위탁할 때 그 범위와 방법 등을 제한함
 - 또한 업무 위탁에 따른 추가적인 의무를 부과함(제2항 - 정보주체에게 수탁자 공개, 제3항 - 정보주체에게 위탁 업무 내용 고지, 제4항 - 수탁자 교육 및 관리감독)
 - 제5항(업무 범위 초과 이용 혹은 제3자 제공), 제6항(재위탁 시 위탁자의 동의 필요), 제8항(개인정보처리자로서 준용 조항)은 수탁자의 의무
@@ -103,3 +103,53 @@
 6. 해당 정보통신서비스 제공자의 소속인 정보보호 관련 업무를 담당하는 부서의 장으로 1년 이상 근무한 경력이 있는 사람
 ```
 - CISO는 개인정보보호 책임자(CPO)를 겸할 수 있다. (`라. 「개인정보 보호법」 제31조제2항에 따른 개인정보 보호책임자의 업무`) 물론 별도로 지정할 수도 있다. 단, CPO가 CISO를 겸임할 수는 없다.
+
+# 소프트웨어 개발
+
+## OOP
+### 디자인 패턴
+#### [Behavioral] The chain of responsibility
+- 어느 객체가 요청을 처리기에 전달할 수 있으며, 책임의 사슬로 연결된 여러 처리기가 그 요청을 연쇄적으로 처리함
+- 요청을 받은 처리기는 그 요청을 처리할지, 다음 처리기로 넘길지 결정함
+- https://refactoring.guru/design-patterns/chain-of-responsibility
+- 언제 사용할까?
+    - 프로그램이 서로 다른 종류의 요청을 다양한 방법으로 처리하지만, 사전에 요청의 종류나 작업순서를 알 수 없을 때
+    - 여러 처리기를 특정한 순서로 실행해야 할 때
+    - 처리기의 집합과 그들의 순서가 런타임에서 변해야 할 때
+
+```Python
+# 추상적인 Base 클래스
+class Handler:
+    def __init__(self, next_handler=None):
+        self.next_handler = next_handler
+
+    def handle_request(self):
+        raise NotImplementedError()
+
+class PartialProcessHandler(Handler):
+    def handle_request(self):
+        # 처리 작업
+
+        if self.next_handler is None:
+            # 다음 처리기가 정의되지 않았다면?
+            print("작업 완료")
+        
+        else:
+            # 다음 처리기의 handle_request() 메소드 호출
+            self.next_handler.handle_request()
+
+# creating handler objects
+first_handler = FirstHandler()
+...
+partial_handler = PartialProcessHandler()
+...
+final_handler = FinalHander()
+
+# chaining the handlers
+first_handler.next_handler = partial_handler
+...
+partial_handler.next_handler = final_hander
+
+# executing
+first_handler.handle_request()
+```
