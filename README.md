@@ -122,8 +122,8 @@ commit 메시지 포멧: yyyy-mm-dd TIL 루틴
 - 참고: https://en.wikipedia.org/wiki/Chain-of-responsibility_pattern
 - 참고: https://refactoring.guru/design-patterns/chain-of-responsibility
 - (처리기 클래스로 이어진) **책임연쇄**, 혹은 **책임의 사슬**
-- 어느 객체가 요청을 처리기에 전달할 수 있으며, 책임의 사슬로 연결된 여러 처리기가 그 요청을 연쇄적으로 처리함
-- 요청을 받은 처리기는 그 요청을 처리할지, 다음 처리기로 넘길지 결정함
+    - 어느 객체가 요청을 처리기에 전달할 수 있으며, 책임의 사슬로 연결된 여러 처리기가 그 요청을 연쇄적으로 처리함
+    - 요청을 받은 처리기는 그 요청을 처리할지, 다음 처리기로 넘길지 결정함
 - 언제 사용할까?
     - 프로그램이 서로 다른 종류의 요청을 다양한 방법으로 처리하지만, 사전에 요청의 종류나 작업순서를 알 수 없을 때
     - 여러 처리기를 특정한 순서로 실행해야 할 때
@@ -164,4 +164,61 @@ partial_handler.next_handler = final_hander
 
 # executing
 first_handler.handle_request()
+```
+
+# 프로그래밍 언어
+## JavaScript
+### NodeJS
+#### winston
+- [npm 페이지(https://www.npmjs.com/package/winston)](https://www.npmjs.com/package/winston)
+- a logger for just about everyhthing
+- npm 간판 로깅 패키지
+```JavaScript
+// logger.js 파일에 logger class 정의, 설정 등 몰아넣으면 편리함
+const winston = require('winston');
+const { combine, errors, timestamp, printf, colorize, align, simple } = winston.format;
+
+const logger = winston.createLogger({
+  // 'debug' 수준 이상의 로그를 모두 기록합니다.
+  level: 'debug',
+
+  // winston.format.combine() => 여러 format 형식 조합
+  // winston.format 여러 format 설정할 수 있는 모듈, 메소드
+  format: combine(
+    errors( { stack: true }),
+    timestamp({format: 'YYYY-MM-DD hh:mm:ss.SSS A'}),
+    align(),
+    printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
+    ),
+  transports: [
+    // level별로 여러 파일에 나누어 기록할 수 있음
+    new winston.transports.File({ filename: './logs/error.log', level: 'error' }),
+    new winston.transports.File({ filename: './logs/combined.log' }),
+  ],
+  
+  // 아래는 미처리 예외나 promise 거절 로그 기록하는 처리기
+  exceptionHandlers: [
+    new winston.transports.File( { filename: './logs/exception.log' }),
+  ],
+  rejectionHandlers: [
+    new winston.transports.File( { filename: './logs/rejections.log' })
+  ]
+});
+
+// production 아닐 경우, console 출력용 logger 추가함
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.combine(
+      colorize(),
+      simple()
+    ),
+  }));
+}
+
+// 여러 모듈에서 불러올 수 있게 내보내기.
+module.exports = logger;
+
+// 예시 - main.js 등에서:
+// const logger = require('./logger');
+// logger.info('실행 완료')
 ```
