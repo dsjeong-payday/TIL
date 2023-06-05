@@ -178,6 +178,35 @@ first_handler.handle_request()
 ```
 
 # 프로그래밍 언어
+## Python
+### dotenv
+- [pypi 홈페이지](https://pypi.org/project/python-dotenv/)
+- `.env` 파일로부터 key-value 쌍을 읽어와서 환경변수로 설정하는 외부 모듈. 
+- [12 Factor](https://12factor.net/) 방법론에서 [Ⅲ.Config](https://12factor.net/ko/config)의 준수를 돕는다. 
+    - Ⅲ.Config: 앱 설정 값은 환경변수에 저장.
+- 설치
+    ```
+    pip install python-dotenv
+    ```
+
+#### 사용법
+- `.env` 파일: key=value 형태로 여러 환경변수 저장. 문자열로 불러옴.
+    ```
+    LOGGING=INFO
+    ROOT_DIR="~/app"
+    DB_HOST="10.0.0.0"
+    ```
+- `load_dotenv()`로 불러오면 프로세스 내에서 환경변수 값에 접근할 수 있음.
+    ```Python
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    # os.environ 이나 os.getenv 등으로 불러오기
+    import os
+    env_value = os.environ.get("<.env key name>")
+    ```
+- `git` 프로젝트일 경우 `.gitignore`에 `.env` 추가하여 보안상 민감한 설정값을 원격 저장소에 올라가지 않게 하자.
+
 ## JavaScript
 ### NodeJS
 #### winston- a logger for just about everyhthing
