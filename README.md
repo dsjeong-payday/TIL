@@ -96,6 +96,50 @@ commit 메시지 포멧: yyyy-mm-dd TIL 루틴
     - ...소득ㆍ세액 공제신고서를 원천징수의무자에게 제출(국세정보통신망에 의한 제출을 포함한다)하여야...
     - 제2항: 소득ㆍ세액 공제신고서에 주민등록표등본을 첨부하여 제출하여야 ... 공제대상 배우자 또는 부양가족이 변동되지 아니한 때에는 주민등록표등본을 제출하지 아니
     - 제3항: 제1항에 따른 신고서를 제출함에 있어서 법 제53조제2항(거주자 또는 동거가족(직계비속ㆍ입양자는 제외한다) 본래의 주소 또는 거소에서 일시 퇴거한 경우)에 해당하는 자가 있는 경우에는 일시퇴거자 동거가족상황표를 근로소득자 소득ㆍ세액 공제신고서에 첨부하여야 한다.
+## 4대보험
+- 근거 법령: 「국민연금법」, 「국민건강보험법」, 「고용보험법」, 「산업재해보상보험법」
+
+# 웹 개발
+## mdn web docs
+### 서버측 웹사이트 프로그래밍(웹서버 개발)
+- [참고](https://developer.mozilla.org/en-US/docs/Learn/Server-side)
+
+#### Introduction -
+- web server - `HTTP` - web browser (client)
+- `HTTP` (HyperText Trnasfer Protocol): 요청 -> 응답
+- 웹 서버: HTTP 요청이 들어올 때까지 대기, 요청이 들어오면 처리 및 응답 반환
+
+##### 정적 사이트(static)
+- 항상 일정하게 하드코딩된 컨텐츠 제공
+- server-side: 파일 -> 웹 서버
+- client-side: 웹 서버 <-> 브라우저
+- 미리 만들어진 파일: HTML, CSS, Javascript, 그 외
+
+##### 동적 사이트(dynamic)
+- 이용자 요구에 따라 웹서비스 자원을 생성하여 제공
+- 주로 Database에서 얻은 데이터를 HTML 템플릿의 placeholder에 전달
+- **server-side programming**
+- server-side
+    - Web Server
+    - Files: 정적 자원 - CSS, JavaScript, images, 그 외
+    - Web Application
+    - Database
+- client-side: HTML, CSS, JavaScript -> 브라우저
+
+##### server-side vs. client-side 프로그래밍
+- Client-side: 브라우저에서 작동하는 코드. 주로 웹페이지의 모습, 행동(UI 요소 스타일, 레이아웃, 네비게이션, 양식 등)
+- Server-side: 요청에 대하여 어느 내용물(*which contents*)을 보여줄 것인지 결정. (데이터 처리 및 검증, 데이터베이스와 통신, 클라이언트에게 보여줄 데이터 발송 등)
+    - 프로그래밍 언어: PHP, Python, Ruby, C#, JavaScript(NodeJS) 등 개발자가 고를 수 있음
+    - 서버의 OS에 접근 가능
+- **웹 프레임워크**: client-side 혹은 server-side의 각자 개발 목적이 다르기에 프레임워크가 제공하는 요소와 기능도 서로 다름
+
+##### server-side 개발을 통해 할 수 있는 것들
+- 효율적인 정보 저장과 전달
+- 사용자화된 UX
+- 컨텐츠에 대한 접근권한 통제
+- 세션/상태 정보 저장
+- 알림과 소통
+- 이용자 데이터 분석
 # 정보보호/보안
 ## 취약점 진단/분석
 - 법적 근거: `「개인정보의 안전성 확보조치 기준」 제6조(접근통제)` ④ 고유식별정보를 처리하는 개인정보처리자는 인터넷 홈페이지를 통해 고유식별정보가 유출ㆍ변조ㆍ훼손되지 않도록 연 1회 이상 취약점을 점검하고 필요한 보완 조치를 하여야 한다.
