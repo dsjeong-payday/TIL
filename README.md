@@ -140,6 +140,24 @@ commit 메시지 포멧: yyyy-mm-dd TIL 루틴
 - 세션/상태 정보 저장
 - 알림과 소통
 - 이용자 데이터 분석
+
+## HTTP
+- HyperText Transfer Protocol
+
+### 주요 메소드
+#### GET
+#### POST
+- 주로 HTML form을 통해 전달 -> 서버에 변경사항
+- 헤더 `Content-type`: 요청 본문의 유형 특정
+    - `text/plain`
+    - `application/json` 등
+- 헤더 `Authorization`: `POST` 요청을 보내는 주체의 권한 소유 여부 판별
+
+## json
+- JSON (JavaScript Object Notation)
+- 데이터 형식
+- 여러 웹 기반 서비스에서 데이터를 주고 받을 때 활용
+
 # 정보보호/보안
 ## 취약점 진단/분석
 - 법적 근거: `「개인정보의 안전성 확보조치 기준」 제6조(접근통제)` ④ 고유식별정보를 처리하는 개인정보처리자는 인터넷 홈페이지를 통해 고유식별정보가 유출ㆍ변조ㆍ훼손되지 않도록 연 1회 이상 취약점을 점검하고 필요한 보완 조치를 하여야 한다.
