@@ -329,6 +329,73 @@ logger.info('실행 완료')
     (4) debug: 디버깅이나 trouble-shooting에 필요한 정보. 프로그램 내부적인 상태나 변수 값에 대한 정보.
     (5) silly: 너무 사소하거나 중요하지 않은 정보들.
 
+### jest - JavaScript Testing Framework
+- [공식 웹사이트](https://jestjs.io/)
+
+#### 설치 및 간단 사용법
+1. 프로젝트 경로에서 설치
+```
+npm install --save-dev jest
+```
+2. 테스트 모듈 생성
+- 테스트 대상: `sum.js`
+```js
+function sum(a, b) {
+  return a + b;
+}
+module.exports = sum;
+```
+- 테스트 모듈: `sum.test.js`
+```js
+// 테스트 대상 불러오기
+const sum = require('./sum');
+
+// 테스트 케이스 작성: expect, toBe
+test('adds 1 + 2 to equal 3', () => {
+  expect(sum(1, 2)).toBe(3);
+});
+```
+3. `package.json` 수정
+```json
+{
+  "scripts": {
+    "test": "jest"
+  }
+}
+```
+4. 실행
+```
+npm test
+...
+PASS  ./sum.test.js
+✓ adds 1 + 2 to equal 3 (5ms)
+```
+
+#### matchers - `expect` 클래스의 여러 판단 메소드
+- `toBe` (`Object.is`): exact equality
+- `toEqual`: value comparision. object 비교 시 다음에 해당하는 key는 무시함
+    - `undefined` properties
+    - `undefined` array items
+    - array sparseness
+    - object type mismatch
+- `toStrictEqual`: object를 비교할 때 `toEqual`과 달리, 모든 key에 대해 strict comparision
+- `not`: 용례  
+```js
+test('adding positive numbers is not zero', () => {
+  for (let a = 1; a < 10; a++) {
+    for (let b = 1; b < 10; b++) {
+      expect(a + b).not.toBe(0);
+    }
+  }
+});
+```
+- `toBeNull`, `toBeUndefined`, `toBeDefined`: 각각 `null`, `undefined`, `define` 판별
+- 조건식 판별: `toBeTruthy`, `toBeFalsy`: 각각 `true`, `false` 
+- 대소 비교: `toBeGreaterThan`, `toBeGreaterThanOrEqual`, `toBeLessThan`, `toBeLessThanOrEqual`
+- 문자열, 정규식; `toMatch`
+- 반복가능자: `toContain`
+- 예외, 오류 발생 여부: `toThrow`
+- 그밖의 `expect` 요소: [API docs](https://jestjs.io/docs/expect)
 # AWS Cloud Computing
 ## AWS Batch
 - AWS 클라우드 배치 작업 관리 서비스
