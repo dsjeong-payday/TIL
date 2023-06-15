@@ -396,6 +396,41 @@ test('adding positive numbers is not zero', () => {
 - 반복가능자: `toContain`
 - 예외, 오류 발생 여부: `toThrow`
 - 그밖의 `expect` 요소: [API docs](https://jestjs.io/docs/expect)
+### JSDoc - a markup language used for annotating JavaScript code files.
+- [공식 홈페이지](https://jsdoc.app/)
+- JavaScript 코드에서 입출력 타입 정보를 관리하는 문서화 기능
+#### 백문불여일견
+
+```js
+/** 아래 함수에 대한 설명 */
+function foo() {
+
+}
+
+/** 
+ * 한 권의 책
+ * @constructor
+*/
+function Book(title, author) {
+}
+
+/** 
+ * 한 권의 책
+ * @constructor
+ * @param {string} title - 제목
+ * @param {string} author - 저자
+*/
+function Book(title, author) {
+}
+```
+- `/** */` 사이에 텍스트와 태그(`@태그명`)를 곁들여 코드에 대한 여러 가지 부가정보를 제공
+- `@param`, `@returns` 등 입출력 변수에 `{type}` 명시
+
+위와 같이 설명을 첨가한 파일에 대해 아래의 명령어를 실행하면, `out/` 경로에 HTML 페이지를 자동으로 생성
+```
+jsdoc book.js
+```
+
 # AWS Cloud Computing
 ## AWS Batch
 - AWS 클라우드 배치 작업 관리 서비스
