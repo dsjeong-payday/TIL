@@ -4,7 +4,28 @@
 commit 메시지 포멧: yyyy-mm-dd TIL 루틴
 
 
+# 여러 가지 생산성 툴
+## markdown 편집
+### [StackEdit](https://stackedit.io/)
+> In-browser Markdown editor
+#### 주요 기능
+- md 작성
+- WYSIWYG controls (화면 상단의 에디터 패널)
+- 레이아웃 사용자화, 실시간 스크롤 연동
+- 외부 저장소 연동(Github, Google Drive, Dropbox 등)
+- 협업, 댓글
+- Desktop 앱 -> 오프라인 사용 가능
+- 확장 기능: Github 스타일 markdown, LaTeX 수식 표현, UML 다이어그램, 악보, 이모지
+### [Mermaid](https://mermaid.js.org/)
+> JavaScript based diagramming and charting tool that renders Markdown-inspired text definitions to create and modify diagrams dynamically.
 
+특정 문법(Markdown과 유사)을 따르는 텍스트 ---렌더링---> 다이어그램, 차트 생성/수정
+
+#### 사용방법
+- [공식 웹 에디터](https://mermaid.live/)
+- [플러그인](https://mermaid.js.org/ecosystem/integrations.html)
+- JavaScript API 호출
+- (NodeJS 프로젝트에) 의존성 배포
 # 대한민국 법령, Compliance
 ## 「개인정보보호법」
 #### 법 제26조(업무위탁에 따른 개인정보의 처리 제한)
