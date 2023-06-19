@@ -578,3 +578,6 @@ m h     dom mon dow      commands
 ### git show
 - `git show <commit id>`: 해당 커밋의 변경 내용 자세히 보여주기
 - `--stat`: 변경 내용 요약한 수치
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTExMTM3NDIyMjNdfQ==
+-->
