@@ -203,6 +203,90 @@ commit 메시지 포멧: yyyy-mm-dd TIL 루틴
 
 
 # 소프트웨어 공학
+## [Software Development Life Cycle (SDLC)](https://www.geeksforgeeks.org/software-development-life-cycle-sdlc/?ref=lbp#article-meta-div)
+소프트웨어 개발 생애주기 6단계
+1. 계획 수립과 요구사항 분석
+2. 요구사항 정의
+3. 아키텍처 설계
+4. 제품 개발
+5. 테스트와 통합
+6. 배포와 유지보수
+
+
+## Engineering Minds
+### Software Engineer KPI
+[A chatGPT answer](https://chat.openai.com/share/57dba6aa-d4e1-402a-a483-4dd6518ccaca)
+`Q`: KPI for software engineers
+```
+Key Performance Indicators (KPIs) are quantifiable measurements used to evaluate the performance of individuals or teams against specific goals and objectives. For software engineers, KPIs are used to track progress and success in their roles, which involve designing, developing, testing, and maintaining software applications. Here are some common KPIs for software engineers:
+
+1.  Code Quality:   
+    -   Code review feedback: Feedback from peers on code readability, maintainability, and adherence to best practices.
+    -   Technical debt: Amount of work needed to fix code issues that could cause problems in the future.
+    -   Code coverage: Percentage of code that is tested by automated tests.
+
+2.  Productivity:
+    -   Lines of code (LOC) written: Although a simple metric, it can help gauge the volume of work completed.
+    -   Number of tasks completed: The total number of tasks, user stories, or issues resolved within a specific period.
+    -   Lead time: The time it takes from task creation to completion.
+
+3.  Timeliness:    
+    -   On-time delivery: Percentage of tasks completed within the expected deadline or sprint.
+    -   Time to resolve bugs: Average time it takes to fix bugs or defects.
+
+4.  Collaboration and Communication:   
+    -   Cross-functional collaboration: How well a software engineer works with team members from other disciplines.
+    -   Contribution to team discussions: Participation in technical discussions, team meetings, and decision-making processes.
+
+5.  Continuous Learning and Improvement:    
+    -   Skill development: Regularly updating skills through learning, attending courses, or acquiring certifications.
+    -   Implementation of new ideas and technologies: Proactively bringing new ideas, tools, or practices to the team to improve development processes.
+
+6.  Customer and Stakeholder Satisfaction:   
+    -   Internal stakeholder satisfaction: Satisfaction of project managers, team members, and other relevant stakeholders.
+    -   External customer satisfaction: Feedback from end-users on the usability, functionality, and reliability of the software product.
+
+It is important to note that KPIs should be customized to the context of each organization or project and aligned with the company's overall objectives. A balanced set of KPIs will help provide a comprehensive evaluation of a software engineer's performance.
+```
+`Q`: I think it would be a good idea to implement KPI for myself to manage my career.
+```
+It's an excellent idea to establish personal KPIs to manage your career, even if your company does not have a formal process in place. By setting measurable goals, you can track your progress and ensure continuous improvement. Here are some steps to help you create your KPIs:
+
+1.  Align with company goals and objectives: Make sure your personal KPIs align with your company's goals, your department's objectives, and your role's requirements. This will ensure you're working towards the same overall vision and contributing to the success of the organization.
+
+2.  Identify key areas of focus: Determine the critical areas you want to improve upon or maintain high performance in. These could be technical skills, soft skills, or specific processes. For example, as a software engineer, your key areas of focus may include code quality, productivity, learning and development, and collaboration.
+
+3.  Set SMART goals: Create specific, measurable, achievable, relevant, and time-bound (SMART) goals for each key area of focus. This will make it easier to track your progress and adjust your goals as needed.
+For example, some personal KPIs for a software engineer could include:
+-   Code Quality: Achieve a minimum of 85% code coverage for all new projects within the next 6 months.
+-   Productivity: Complete an average of 8 tasks per week over the next quarter.
+-   Learning and Development: Obtain a new certification or complete a relevant course in your field within the next year.
+-   Collaboration: Actively participate in at least one cross-functional project or initiative per quarter.
+
+4.  Track your progress: Regularly monitor your performance against your personal KPIs. This can be done by maintaining a simple spreadsheet or using a project management tool. Evaluate your progress, identifying areas of improvement or where adjustments might be needed.
+
+5.  Reflect and adjust: Periodically review your KPIs to ensure they still align with your personal and professional growth goals. Be prepared to adjust your goals or set new ones as your career evolves or as you achieve specific milestones.
+
+6.  Seek feedback: If possible, share your KPIs with your manager or colleagues to gather their insights and feedback. This can help you validate your goals, identify blind spots, and receive additional support and encouragement.
+    
+By taking control of your personal KPIs, you'll be better positioned to manage your career and demonstrate your value to the organization, even without a formal performance management process in place.
+```
+
+[13 Software Development KPIs Every Dev Team Should Track](https://www.datapad.io/blog/software-development-kpis)
+KPI #1. Cycle Time
+KPI #2. Development Velocity
+KPI #3. Change Failure Rate
+KPI #4. Deployment Frequency
+KPI #5. Pull Request [PR] Size
+KPI #6. Defect Detection Ratio [DDR]
+KPI #7. Code Coverage Percentage
+KPI #8. Code Churn
+KPI #9. Code Simplicity
+KPI #10. Cumulative Flow
+KPI #11. Bug Rates
+KPI #12. Mean Time Between Failures [MTBF] and Mean Time to Repair [MTTR]
+KPI #13. Net Promoter Score
+
 ## OOP
 ### 디자인 패턴
 #### [Behavioral] The chain of responsibility
@@ -323,6 +407,55 @@ first_handler.handle_request()
 
 # 프로그래밍 언어
 ## Python
+### SQLAlchemy (ORM library)
+> a comprehensive set of tools for working with databases and Python
+
+ORM (Object Relational Mapper) + Core + SQL Expression Language
+ORM은 말그대로 객체(object)와 관계(relation) 간의 매핑이다. 혹은 그러한 매핑을 구현하는 여러 기술과 도구를 포함한다. Java, Python 등의 객체지향 언어에서 어느 관계형 데이터베이스상의 개체(entity)를 대변하는 클래스를 작성할 수 있다. 클래스 메소드에는 CRUD에 대응하는 여러 데이터 조작 기능을 구현할 수 있다. 이러한 클래스로부터 호출된 객체는 데이터베이스에 존재하거나 생성될 실제 데이터 단위를 나타낸다. 프로그래밍 언어의 객체와 관계형 데이터베이스의 데이터가 서로 매핑된 것이다. `SQLAlchemy`와 같은 ORM 라이브러리는 매핑을 간편하게 구현할 수 있도록 도와주는 도구의 모음이다. 아래는 `User` 클래스와 `users` 테이블을 매핑하는 코드.
+```Python
+from sqlalchemy import create_engine 
+from sqlalchemy.ext.declarative import declarative_base 
+from sqlalchemy import Column, Integer, String 
+
+engine = create_engine('sqlite:///example.db', echo=True) 
+Base = declarative_base()
+
+class  User(Base):
+	__tablename__ = 'users'  
+
+	id = Column(Integer, primary_key=True) 
+	name = Column(String) 
+	email = Column(String) 
+	
+	def  __repr__(self): 
+		return  f"User(id={self.id}, name={self.name}, email={self.email})"
+```
+
+```Python
+Base.metadata.create_all(engine)
+```
+
+```Python
+from sqlalchemy.orm import Session 
+
+# start session 
+session = Session(engine) 
+
+# create user 
+new_user = User(name="Alice", email="alice@example.com") 
+session.add(new_user) 
+
+# commit the transaction 
+session.commit() 
+print(new_user.id) # prints the new user's id
+```
+```Python
+# Query the database 
+users = session.query(User).all() 
+
+for user in users: 
+	print(user)
+```
 ### dotenv
 - [pypi 홈페이지](https://pypi.org/project/python-dotenv/)
 - `.env` 파일로부터 key-value 쌍을 읽어와서 환경변수로 설정하는 외부 모듈. 
