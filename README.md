@@ -493,6 +493,34 @@ for user in users:
 - `git` 프로젝트일 경우 `.gitignore`에 `.env` 추가하여 보안상 민감한 설정값을 원격 저장소에 올라가지 않게 하자.
 
 ## JavaScript
+
+### 표준 기능
+#### Array
+##### filter()
+주어진 배열의 `shallow copy`를 만들고, 조건을 만족하는 요소만 추려서 새로운 배열을 반환한다. 새로운 배열을 반환하기 때문에, `shallow copy`된 원본 배열은 영향을 받지 않는다.
+```js
+const words = ['spray', 'limit', 'elite', 'exuberant', 'destruction', 'present'];
+
+const result = words.filter(word => word.length > 6);
+
+console.log(result);
+// Expected output: Array ["exuberant", "destruction", "present"]
+```
+하지만 배열의 요소가 객체일 경우 `shallow copy`로 인한 원본 의존성이 문제가 될 수도 있다. `객체의 shallow copy`는 각각의 속성들이 원본 객체의 해당 속성과 동일한 참조를 공유한다. ([mdn 설명](https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy))
+>a copy whose properties share the same [references](https://developer.mozilla.org/en-US/docs/Glossary/Object_reference) (point to the same underlying values) as those of the source object from which the copy was made.
+
+그 결과 원본이나 복사본 중 어느 한 가지를 수정할 경우, 다른 한쪽도 마찬가지로 수정된 값을 참조할 것이다. 
+이와 반대로 `deep copy`는 원본과 복사본이 서로 독립적임. 객체로 이루어진 어느 배열에 대해서 `deep copy` 형식의 `filter()` 기능을 수행하려면, 각각의 객체를 `JSON.parse(JSON.stringify())`와 같은 방법으로 `deep copy`하고, 새로운 배열에 담는다. 아래는 `Array` 클래스에 `deepFilter`라는 메소드를 정의하는 예문.
+```js
+Array.prototype.deepFilter = function(predicate) { 
+	return this.reduce((acc, val) => { 
+		if ( predicate(val) ) { 	
+			acc.push(JSON.parse(JSON.stringify(val)));
+			} 
+		return acc; }, []);
+};
+```
+
 ### NodeJS
 #### winston- a logger for just about everyhthing
 - [npm 페이지(https://www.npmjs.com/package/winston)](https://www.npmjs.com/package/winston)
