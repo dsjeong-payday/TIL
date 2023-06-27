@@ -184,6 +184,31 @@ commit 메시지 포멧: yyyy-mm-dd TIL 루틴
 ## 취약점 진단/분석
 - 법적 근거: `「개인정보의 안전성 확보조치 기준」 제6조(접근통제)` ④ 고유식별정보를 처리하는 개인정보처리자는 인터넷 홈페이지를 통해 고유식별정보가 유출ㆍ변조ㆍ훼손되지 않도록 연 1회 이상 취약점을 점검하고 필요한 보완 조치를 하여야 한다.
 
+
+### [OWASP Top 10: 2021](https://owasp.org/Top10/)
+OWASP에서 선정한 웹 애플리케이션 10대 취약점. 최근 개정판은 2021년에 2017년 목록을 수정한 것이다.
+#### [ A01:2021-Broken Access Control](https://owasp.org/Top10/A01_2021-Broken_Access_Control/) - 접근 통제 실패
+웹 앱은 이용자에게 여러 가지 행동 권한을 부여한다. 권한 통제에 실패하면 이용자는 허가받지 않은 행동을 취할 수 있게 된다. 예를 들면 인가받지 않은 자료에 대한 조회/수정/삭제하거나, 혹은 허용 범위를 초과한 기능을 실행할 수도 있다. 구체적인 취약점 예시는 다음과 같다.
+
+- 최소 권한의 원칙, 거부 기본값 원칙 미준수: 특정 기능, 역할, 이용자에게 허가되어야 할 권한이 아무나에게 제공
+- 권한 통제 확인 우회: URL 수정, 내부 앱 상태, HTML 페이지, 혹은 API 요청을 조적함으로써 권한 확인을 우회할 수 있는 지점
+- (안전하지 않은 direct object 참조) 고유 식별자를 제공함으로써 다른 사람의 계정을 보거나 수정할 수 있게 허용
+- 권한 통제가 누락된 HTTP methods(`POST`, `PUT`, 그리고 `DELETE`)에 API 접근
+- 권한 상승 허용: 관리자 권한이 있거나 관리자 계정으로 로그인 한 것처럼 속이는 경우
+- 메타정보 조작: `JSON Web Token (JWT)`, 쿠키, 혹은 숨겨진 필드 등을 탈취하거나 악용
+- CORS 설정 오류: 허가받지 않은/신뢰하지 않는 출처로부터 API 접근 허용
+- 인증이 필요하거나 제한된 페이지를 그렇지 않은 이용자에게 강제로 보여주는 경우
+
+#### [A02:2021-Cryptographic Failures](https://owasp.org/Top10/A02_2021-Cryptographic_Failures/)
+#### [A03:2021-Injection](https://owasp.org/Top10/A03_2021-Injection/)
+#### [A04:2021-Insecure Design](https://owasp.org/Top10/A04_2021-Insecure_Design/)
+#### [A05:2021-Security Misconfiguration](https://owasp.org/Top10/A05_2021-Security_Misconfiguration/)
+#### [A06:2021-Vulnerable and Outdated Components](https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/)
+#### [A07:2021-Identification and Authentication Failures](https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/)
+#### [A08:2021-Software and Data Integrity Failures](https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/)
+#### [A09:2021-Security Logging and Monitoring Failures](https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/)
+#### [A10:2021-Server-Side Request Forgery](https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/)
+
 ### ZAP - 웹페이지 취약점 분석 툴
 - [공식 홈페이지](https://www.zaproxy.org/)
 - 오픈소스 웹 앱 스캐너 중 가장 활발하게 개발되고 있는 툴(https://github.com/psiinon/open-source-web-scanners)
