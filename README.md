@@ -4,7 +4,36 @@
 commit 메시지 포멧: yyyy-mm-dd TIL 루틴
 
 
+# 여러 가지 생산성 툴
+## Notion
+### 데이터베이스
+#### 하위 작업 유형
+데이터베이스 우측 상단의 `...` 버튼 클릭
+하위 항목 `꺼짐` -> `하위 항목 켜기`
+기존 항목에 드랍다운(▶ -> ▼) 클릭하고 하위 항목 추가하기
 
+
+## markdown 편집
+### [StackEdit](https://stackedit.io/)
+> In-browser Markdown editor
+#### 주요 기능
+- md 작성
+- WYSIWYG controls (화면 상단의 에디터 패널)
+- 레이아웃 사용자화, 실시간 스크롤 연동
+- 외부 저장소 연동(Github, Google Drive, Dropbox 등)
+- 협업, 댓글
+- Desktop 앱 -> 오프라인 사용 가능
+- 확장 기능: Github 스타일 markdown, LaTeX 수식 표현, UML 다이어그램, 악보, 이모지
+### [Mermaid](https://mermaid.js.org/)
+> JavaScript based diagramming and charting tool that renders Markdown-inspired text definitions to create and modify diagrams dynamically.
+
+특정 문법(Markdown과 유사)을 따르는 텍스트 ---렌더링---> 다이어그램, 차트 생성/수정
+
+#### 사용방법
+- [공식 웹 에디터](https://mermaid.live/)
+- [플러그인](https://mermaid.js.org/ecosystem/integrations.html)
+- JavaScript API 호출
+- (NodeJS 프로젝트에) 의존성 배포
 # 대한민국 법령, Compliance
 ## 「개인정보보호법」
 #### 법 제26조(업무위탁에 따른 개인정보의 처리 제한)
@@ -100,6 +129,17 @@ commit 메시지 포멧: yyyy-mm-dd TIL 루틴
 - 근거 법령: 「국민연금법」, 「국민건강보험법」, 「고용보험법」, 「산업재해보상보험법」
 
 # 웹 개발
+## 웹 기술
+### RESTful API
+- REST (Representational State Transfer): 소프트웨어 아키텍처 양식. 아래의 제약조건을 충족함으로써 경량, 유지보수성, 확장성 지향 -> 클라우드 기반이나 모바일 앱에 적합
+    1. 자원(Resources): 시스템에 존재하는 각각의 개체(entity)는 유일한 URI(Uniform Resource Identifier)를 통해 접근 가능. text 파일, HTML 페이지, 이미지, 비디오, 비즈니스 데이터 등
+    2. 상태없음(Stateless): 클라이언트로부터 서버로 향하는 각각의 요청은 반드시 그 요청을 수행하는 데에 필요한 모든 정보를 갖추어야 함. 서버는 가장 최근의 HTTP 요청에 대해 아무것도 저장하지 않아야 함. 각각의 요청은 서로 독립적으로 처리됨.
+    3. Client-Server Architecture: 클라이언트는 UI/UX를 담당하며, 서버는 요청을 처리하고 자원을 관리하는 역할을 담당함. 클라이언트와 서버는 서로 독립적으로 가동되며, 개발과 개선 또한 분리하여 이루어짐.
+    4. Cacheable: 클라이언트가 HTTP 응답을 캐싱할 수 있음. 추후 해당 정보가 필요할 때 새로운 요청을 보내는 대신 캐싱된 데이터를 참조함.
+    5. Uniform Interface: 클라이언트와 서버 간의 통신 방식을 몇 가지 표준화된 방식으로 정의함. (GET, POST, PUT, DELETE, ...)
+    6. Layered System: 계층화된 형태의 애플리케이션을 허용함. 각각의 계층마다 역할과 책임 부여. 확장성과 모듈성.
+    7. Code on Demand (선택): 서버가 클라이언트에게 실행 가능한 코드를 전달함으로써 일시적으로 기능을 확장/사용자화 할 수 있음.
+- RESTful API(Application Programming Interface): 위의 REST 제약조건을 만족하는 HTTP 서비스
 ## mdn web docs
 ### 서버측 웹사이트 프로그래밍(웹서버 개발)
 - [참고](https://developer.mozilla.org/en-US/docs/Learn/Server-side)
@@ -162,6 +202,31 @@ commit 메시지 포멧: yyyy-mm-dd TIL 루틴
 ## 취약점 진단/분석
 - 법적 근거: `「개인정보의 안전성 확보조치 기준」 제6조(접근통제)` ④ 고유식별정보를 처리하는 개인정보처리자는 인터넷 홈페이지를 통해 고유식별정보가 유출ㆍ변조ㆍ훼손되지 않도록 연 1회 이상 취약점을 점검하고 필요한 보완 조치를 하여야 한다.
 
+
+### [OWASP Top 10: 2021](https://owasp.org/Top10/)
+OWASP에서 선정한 웹 애플리케이션 10대 취약점. 최근 개정판은 2021년에 2017년 목록을 수정한 것이다.
+#### [ A01:2021-Broken Access Control](https://owasp.org/Top10/A01_2021-Broken_Access_Control/) - 접근 통제 실패
+웹 앱은 이용자에게 여러 가지 행동 권한을 부여한다. 권한 통제에 실패하면 이용자는 허가받지 않은 행동을 취할 수 있게 된다. 예를 들면 인가받지 않은 자료에 대한 조회/수정/삭제하거나, 혹은 허용 범위를 초과한 기능을 실행할 수도 있다. 구체적인 취약점 예시는 다음과 같다.
+
+- 최소 권한의 원칙, 거부 기본값 원칙 미준수: 특정 기능, 역할, 이용자에게 허가되어야 할 권한이 아무나에게 제공
+- 권한 통제 확인 우회: URL 수정, 내부 앱 상태, HTML 페이지, 혹은 API 요청을 조적함으로써 권한 확인을 우회할 수 있는 지점
+- (안전하지 않은 direct object 참조) 고유 식별자를 제공함으로써 다른 사람의 계정을 보거나 수정할 수 있게 허용
+- 권한 통제가 누락된 HTTP methods(`POST`, `PUT`, 그리고 `DELETE`)에 API 접근
+- 권한 상승 허용: 관리자 권한이 있거나 관리자 계정으로 로그인 한 것처럼 속이는 경우
+- 메타정보 조작: `JSON Web Token (JWT)`, 쿠키, 혹은 숨겨진 필드 등을 탈취하거나 악용
+- CORS 설정 오류: 허가받지 않은/신뢰하지 않는 출처로부터 API 접근 허용
+- 인증이 필요하거나 제한된 페이지를 그렇지 않은 이용자에게 강제로 보여주는 경우
+
+#### [A02:2021-Cryptographic Failures](https://owasp.org/Top10/A02_2021-Cryptographic_Failures/)
+#### [A03:2021-Injection](https://owasp.org/Top10/A03_2021-Injection/)
+#### [A04:2021-Insecure Design](https://owasp.org/Top10/A04_2021-Insecure_Design/)
+#### [A05:2021-Security Misconfiguration](https://owasp.org/Top10/A05_2021-Security_Misconfiguration/)
+#### [A06:2021-Vulnerable and Outdated Components](https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components/)
+#### [A07:2021-Identification and Authentication Failures](https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/)
+#### [A08:2021-Software and Data Integrity Failures](https://owasp.org/Top10/A08_2021-Software_and_Data_Integrity_Failures/)
+#### [A09:2021-Security Logging and Monitoring Failures](https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/)
+#### [A10:2021-Server-Side Request Forgery](https://owasp.org/Top10/A10_2021-Server-Side_Request_Forgery_%28SSRF%29/)
+
 ### ZAP - 웹페이지 취약점 분석 툴
 - [공식 홈페이지](https://www.zaproxy.org/)
 - 오픈소스 웹 앱 스캐너 중 가장 활발하게 개발되고 있는 툴(https://github.com/psiinon/open-source-web-scanners)
@@ -189,8 +254,129 @@ commit 메시지 포멧: yyyy-mm-dd TIL 루틴
 
 
 # 소프트웨어 공학
+## [Software Development Life Cycle (SDLC)](https://www.geeksforgeeks.org/software-development-life-cycle-sdlc/?ref=lbp#article-meta-div)
+소프트웨어 개발 생애주기 6단계
+1. 계획 수립과 요구사항 분석
+2. 요구사항 정의
+3. 아키텍처 설계
+4. 제품 개발
+5. 테스트와 통합
+6. 배포와 유지보수
+
+
+## Engineering Minds
+### Software Engineer KPI
+[A chatGPT answer](https://chat.openai.com/share/57dba6aa-d4e1-402a-a483-4dd6518ccaca)
+`Q`: KPI for software engineers
+```
+Key Performance Indicators (KPIs) are quantifiable measurements used to evaluate the performance of individuals or teams against specific goals and objectives. For software engineers, KPIs are used to track progress and success in their roles, which involve designing, developing, testing, and maintaining software applications. Here are some common KPIs for software engineers:
+
+1.  Code Quality:   
+    -   Code review feedback: Feedback from peers on code readability, maintainability, and adherence to best practices.
+    -   Technical debt: Amount of work needed to fix code issues that could cause problems in the future.
+    -   Code coverage: Percentage of code that is tested by automated tests.
+
+2.  Productivity:
+    -   Lines of code (LOC) written: Although a simple metric, it can help gauge the volume of work completed.
+    -   Number of tasks completed: The total number of tasks, user stories, or issues resolved within a specific period.
+    -   Lead time: The time it takes from task creation to completion.
+
+3.  Timeliness:    
+    -   On-time delivery: Percentage of tasks completed within the expected deadline or sprint.
+    -   Time to resolve bugs: Average time it takes to fix bugs or defects.
+
+4.  Collaboration and Communication:   
+    -   Cross-functional collaboration: How well a software engineer works with team members from other disciplines.
+    -   Contribution to team discussions: Participation in technical discussions, team meetings, and decision-making processes.
+
+5.  Continuous Learning and Improvement:    
+    -   Skill development: Regularly updating skills through learning, attending courses, or acquiring certifications.
+    -   Implementation of new ideas and technologies: Proactively bringing new ideas, tools, or practices to the team to improve development processes.
+
+6.  Customer and Stakeholder Satisfaction:   
+    -   Internal stakeholder satisfaction: Satisfaction of project managers, team members, and other relevant stakeholders.
+    -   External customer satisfaction: Feedback from end-users on the usability, functionality, and reliability of the software product.
+
+It is important to note that KPIs should be customized to the context of each organization or project and aligned with the company's overall objectives. A balanced set of KPIs will help provide a comprehensive evaluation of a software engineer's performance.
+```
+`Q`: I think it would be a good idea to implement KPI for myself to manage my career.
+```
+It's an excellent idea to establish personal KPIs to manage your career, even if your company does not have a formal process in place. By setting measurable goals, you can track your progress and ensure continuous improvement. Here are some steps to help you create your KPIs:
+
+1.  Align with company goals and objectives: Make sure your personal KPIs align with your company's goals, your department's objectives, and your role's requirements. This will ensure you're working towards the same overall vision and contributing to the success of the organization.
+
+2.  Identify key areas of focus: Determine the critical areas you want to improve upon or maintain high performance in. These could be technical skills, soft skills, or specific processes. For example, as a software engineer, your key areas of focus may include code quality, productivity, learning and development, and collaboration.
+
+3.  Set SMART goals: Create specific, measurable, achievable, relevant, and time-bound (SMART) goals for each key area of focus. This will make it easier to track your progress and adjust your goals as needed.
+For example, some personal KPIs for a software engineer could include:
+-   Code Quality: Achieve a minimum of 85% code coverage for all new projects within the next 6 months.
+-   Productivity: Complete an average of 8 tasks per week over the next quarter.
+-   Learning and Development: Obtain a new certification or complete a relevant course in your field within the next year.
+-   Collaboration: Actively participate in at least one cross-functional project or initiative per quarter.
+
+4.  Track your progress: Regularly monitor your performance against your personal KPIs. This can be done by maintaining a simple spreadsheet or using a project management tool. Evaluate your progress, identifying areas of improvement or where adjustments might be needed.
+
+5.  Reflect and adjust: Periodically review your KPIs to ensure they still align with your personal and professional growth goals. Be prepared to adjust your goals or set new ones as your career evolves or as you achieve specific milestones.
+
+6.  Seek feedback: If possible, share your KPIs with your manager or colleagues to gather their insights and feedback. This can help you validate your goals, identify blind spots, and receive additional support and encouragement.
+    
+By taking control of your personal KPIs, you'll be better positioned to manage your career and demonstrate your value to the organization, even without a formal performance management process in place.
+```
+
+[13 Software Development KPIs Every Dev Team Should Track](https://www.datapad.io/blog/software-development-kpis)
+KPI #1. Cycle Time
+KPI #2. Development Velocity
+KPI #3. Change Failure Rate
+KPI #4. Deployment Frequency
+KPI #5. Pull Request [PR] Size
+KPI #6. Defect Detection Ratio [DDR]
+KPI #7. Code Coverage Percentage
+KPI #8. Code Churn
+KPI #9. Code Simplicity
+KPI #10. Cumulative Flow
+KPI #11. Bug Rates
+KPI #12. Mean Time Between Failures [MTBF] and Mean Time to Repair [MTTR]
+KPI #13. Net Promoter Score
+
 ## OOP
 ### 디자인 패턴
+#### MVC 패턴
+MVC 패턴은 웹 앱에 널리 쓰이는 디자인 패턴으로서 아래의 세 가지 요소로 구성된다.
+-   Model: 데이터와 비즈니스 로직 관리
+-   View: UI와 데이터 표현부
+-   Controller: 이용자 입력의 처리와 Model과 View와의 상호작용
+
+##### Model
+필요한 데이터를 받아오거나, 웹 앱의 다른 부분에서 다루기 용이한 형태로 변환할 수 있다. `Node.js` 프로젝트에서는 주요 데이터베이스와의 CRUD, 외부 API 호출 등을 포함할 것이다.
+##### View
+이용자 부분에서 접하는 HTML, CSS, 그리고 JavaScript.
+##### Controller
+View로부터 요청을 처리하거나 Model로 전달한다. 또한 Model로부터 받은 데이터를 View와 이용자에게 전달한다.
+
+##### [ChatGPT] Node.js `express` 프로젝트에 적용하기
+일반적인 프로젝트 구조 예시
+```
+. 
+├── .env 
+├── .gitignore 
+├── app.js  # express entry point
+├── package.json 
+├── README.md 
+├── node_modules/ 
+├── public/  # static files like HTML, CSS, JS
+├── src/ 
+│ ├── config/  # 설정 파일? database.js의 경우 클래스 정의, 접속 정보 불러오기, 연결 기능 담당
+│ ├── controllers/  # View-Model 왔다리 갔다리
+│ ├── middlewares/ 
+│ ├── models/ 
+│ ├── routes/  # route definitions of the API's endpoints
+│ ├── services/  # 비즈니스 로직을 처리하기 위해 필요한 외부 서비스. Database, file system, external APIs
+│ ├── utils/  # 기능성 모듈이나 파일
+│ └── index.js 
+├── tests/  # 테스트 스크립트
+└── views/  # front-end 기능
+```
+
 #### [Behavioral] The chain of responsibility
 - 참고: https://en.wikipedia.org/wiki/Chain-of-responsibility_pattern
 - 참고: https://refactoring.guru/design-patterns/chain-of-responsibility
@@ -239,8 +425,125 @@ partial_handler.next_handler = final_hander
 first_handler.handle_request()
 ```
 
+## 데이터베이스
+## MySQL
+### Trigger
+### Event Scheduler
+- MySQL official manual [25.4 Using the Event Scheduler](https://dev.mysql.com/doc/refman/8.0/en/event-scheduler.html)
+- schedule에 의해 실행되는 '예약/반복 명령' (Linux `at`, `cron`)
+#### 이벤트 생성하기: `EVENT ... ON SCHEDULE ...`
+- 사전에 `event scheduler`가 활성화되어 있어야 함 -> [(참고) 25.4.2 Event Scheduler Configuration](https://dev.mysql.com/doc/refman/8.0/en/events-configuration.html)
+	- `SHOW PROCESSLIST;` 실행 시 `User: event_scheduler` 있는지?
+	- 없으면 활성화하기 -> `SET  GLOBAL event_scheduler =  ON;`
+- Full syntax
+	```SQL
+	CREATE  
+		[DEFINER  =  _user_]  
+		EVENT  
+		[IF  NOT  EXISTS]  
+		_event_name_  
+		ON  SCHEDULE  _schedule_  
+		[ON  COMPLETION  [NOT]  PRESERVE]  
+		[ENABLE  |  DISABLE  |  DISABLE  ON  SLAVE]  
+		[COMMENT  '_string_']  
+		DO  _event_body_;  
+
+	_schedule_: { 
+		AT  _timestamp_  [+  INTERVAL  _interval_]  ...  
+		|  EVERY  _interval_  
+		[STARTS  _timestamp_  [+  INTERVAL  _interval_]  ...]  
+		[ENDS  _timestamp_  [+  INTERVAL  _interval_]  ...] 
+	} 
+
+	_interval_: 
+		_quantity_ {YEAR  |  QUARTER  |  MONTH  |  DAY  |  HOUR  |  MINUTE  |  
+					WEEK  |  SECOND  |  YEAR_MONTH  |  DAY_HOUR  |  DAY_MINUTE  |  
+					DAY_SECOND  |  HOUR_MINUTE  |  HOUR_SECOND  |  MINUTE_SECOND}
+	```
+#### 이벤트 목록보기: `SHOW EVENTS`
+## 소프트웨어 테스트 기법
+1. 테스트 대상의 역할이 무엇인지 정의
+- 가능한 모든 실패의 경우, edge cases 고려하기
+- 예시: 네트워크 공유 폴더에 파일 복사하는 기능
+	-  원본 파일이 없다면? 
+	- 네트워크 연결이 끊어졌다면? 
+	- 도착지에 충분한 용량이 없다면? 
+	- 도착지에 파일이 이미 존재한다면?
+2. 테스트 작성
+- 테스트 프레임워크 등을 활용해 함수의 기능을 예상되는 결과물을 확인하는 테스트 작성하기
+- 테스트는 함수가 예상대로 작동하였을 때의 조건(assertion)을 포함해야 함
+- 예시
+	- 복사 여부 체크
+	- 원본 파일 존재 여부 체크
+	- 네트워크 연결 상태 체크
+	- 도착지 여유 용량 vs 파일 용량 체크
+	- 도착지에 이미 존재하는지 체크
+3. 함수 작성
+- 위의 테스트가 모두 쓰여지고 나면 함수 작성 (당연히 테스트를 통과할 수 있게 작성)
+4. 테스트 실행
+- 함수 작성 후 테스트 실행. 모든 테스트 케이스를 통과할 때까지 수정
+5. 리팩터
+- 모든 테스트를 마치고 함수의 구조, 가독성, 성능 등을 향상할 수 있게 리팩터하기.
+- 리팩터 이후에 테스트 실행하여 기능에 문제가 없는지 확인
+
+### Unit Test 단위 테스트
+#### Mock object 모조품
+- 테스트 환경에서 실행할 때 실제 시스템과 분리된 부분
+- 목표: to define the behavior and expectations of a dependency in a test scenario
+- 예를 들면 어느 데이터베이스나 네트워크에 작용하는 함수를 테스트할 때 실제 대상 대신에 가짜 객체로 대체
+
+
 # 프로그래밍 언어
 ## Python
+### SQLAlchemy (ORM library)
+> a comprehensive set of tools for working with databases and Python
+
+ORM (Object Relational Mapper) + Core + SQL Expression Language
+ORM은 말그대로 객체(object)와 관계(relation) 간의 매핑이다. 혹은 그러한 매핑을 구현하는 여러 기술과 도구를 포함한다. Java, Python 등의 객체지향 언어에서 어느 관계형 데이터베이스상의 개체(entity)를 대변하는 클래스를 작성할 수 있다. 클래스 메소드에는 CRUD에 대응하는 여러 데이터 조작 기능을 구현할 수 있다. 이러한 클래스로부터 호출된 객체는 데이터베이스에 존재하거나 생성될 실제 데이터 단위를 나타낸다. 프로그래밍 언어의 객체와 관계형 데이터베이스의 데이터가 서로 매핑된 것이다. `SQLAlchemy`와 같은 ORM 라이브러리는 매핑을 간편하게 구현할 수 있도록 도와주는 도구의 모음이다. 아래는 `User` 클래스와 `users` 테이블을 매핑하는 코드.
+```Python
+from sqlalchemy import create_engine 
+from sqlalchemy.ext.declarative import declarative_base 
+from sqlalchemy import Column, Integer, String 
+
+engine = create_engine('sqlite:///example.db', echo=True) 
+Base = declarative_base()
+
+class  User(Base):
+	__tablename__ = 'users'  
+
+	id = Column(Integer, primary_key=True) 
+	name = Column(String) 
+	email = Column(String) 
+	
+	def  __repr__(self): 
+		return  f"User(id={self.id}, name={self.name}, email={self.email})"
+```
+
+```Python
+Base.metadata.create_all(engine)
+```
+
+```Python
+from sqlalchemy.orm import Session 
+
+# start session 
+session = Session(engine) 
+
+# create user 
+new_user = User(name="Alice", email="alice@example.com") 
+session.add(new_user) 
+
+# commit the transaction 
+session.commit() 
+print(new_user.id) # prints the new user's id
+```
+```Python
+# Query the database 
+users = session.query(User).all() 
+
+for user in users: 
+	print(user)
+```
 ### dotenv
 - [pypi 홈페이지](https://pypi.org/project/python-dotenv/)
 - `.env` 파일로부터 key-value 쌍을 읽어와서 환경변수로 설정하는 외부 모듈. 
@@ -270,6 +573,34 @@ first_handler.handle_request()
 - `git` 프로젝트일 경우 `.gitignore`에 `.env` 추가하여 보안상 민감한 설정값을 원격 저장소에 올라가지 않게 하자.
 
 ## JavaScript
+
+### 표준 기능
+#### Array
+##### filter()
+주어진 배열의 `shallow copy`를 만들고, 조건을 만족하는 요소만 추려서 새로운 배열을 반환한다. 새로운 배열을 반환하기 때문에, `shallow copy`된 원본 배열은 영향을 받지 않는다.
+```js
+const words = ['spray', 'limit', 'elite', 'exuberant', 'destruction', 'present'];
+
+const result = words.filter(word => word.length > 6);
+
+console.log(result);
+// Expected output: Array ["exuberant", "destruction", "present"]
+```
+하지만 배열의 요소가 객체일 경우 `shallow copy`로 인한 원본 의존성이 문제가 될 수도 있다. `객체의 shallow copy`는 각각의 속성들이 원본 객체의 해당 속성과 동일한 참조를 공유한다. ([mdn 설명](https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy))
+>a copy whose properties share the same [references](https://developer.mozilla.org/en-US/docs/Glossary/Object_reference) (point to the same underlying values) as those of the source object from which the copy was made.
+
+그 결과 원본이나 복사본 중 어느 한 가지를 수정할 경우, 다른 한쪽도 마찬가지로 수정된 값을 참조할 것이다. 
+이와 반대로 `deep copy`는 원본과 복사본이 서로 독립적임. 객체로 이루어진 어느 배열에 대해서 `deep copy` 형식의 `filter()` 기능을 수행하려면, 각각의 객체를 `JSON.parse(JSON.stringify())`와 같은 방법으로 `deep copy`하고, 새로운 배열에 담는다. 아래는 `Array` 클래스에 `deepFilter`라는 메소드를 정의하는 예문.
+```js
+Array.prototype.deepFilter = function(predicate) { 
+	return this.reduce((acc, val) => { 
+		if ( predicate(val) ) { 	
+			acc.push(JSON.parse(JSON.stringify(val)));
+			} 
+		return acc; }, []);
+};
+```
+
 ### NodeJS
 #### winston- a logger for just about everyhthing
 - [npm 페이지(https://www.npmjs.com/package/winston)](https://www.npmjs.com/package/winston)
@@ -335,6 +666,108 @@ logger.info('실행 완료')
     (3) verbose: info보다는 더 상세하고 잡다한 정보.
     (4) debug: 디버깅이나 trouble-shooting에 필요한 정보. 프로그램 내부적인 상태나 변수 값에 대한 정보.
     (5) silly: 너무 사소하거나 중요하지 않은 정보들.
+
+### jest - JavaScript Testing Framework
+- [공식 웹사이트](https://jestjs.io/)
+
+#### 설치 및 간단 사용법
+1. 프로젝트 경로에서 설치
+```
+npm install --save-dev jest
+```
+2. 테스트 모듈 생성
+- 테스트 대상: `sum.js`
+```js
+function sum(a, b) {
+  return a + b;
+}
+module.exports = sum;
+```
+- 테스트 모듈: `sum.test.js`
+```js
+// 테스트 대상 불러오기
+const sum = require('./sum');
+
+// 테스트 케이스 작성: expect, toBe
+test('adds 1 + 2 to equal 3', () => {
+  expect(sum(1, 2)).toBe(3);
+});
+```
+3. `package.json` 수정
+```json
+{
+  "scripts": {
+    "test": "jest"
+  }
+}
+```
+4. 실행
+```
+npm test
+...
+PASS  ./sum.test.js
+✓ adds 1 + 2 to equal 3 (5ms)
+```
+
+#### matchers - `expect` 클래스의 여러 판단 메소드
+- `toBe` (`Object.is`): exact equality
+- `toEqual`: value comparision. object 비교 시 다음에 해당하는 key는 무시함
+    - `undefined` properties
+    - `undefined` array items
+    - array sparseness
+    - object type mismatch
+- `toStrictEqual`: object를 비교할 때 `toEqual`과 달리, 모든 key에 대해 strict comparision
+- `not`: 용례  
+```js
+test('adding positive numbers is not zero', () => {
+  for (let a = 1; a < 10; a++) {
+    for (let b = 1; b < 10; b++) {
+      expect(a + b).not.toBe(0);
+    }
+  }
+});
+```
+- `toBeNull`, `toBeUndefined`, `toBeDefined`: 각각 `null`, `undefined`, `define` 판별
+- 조건식 판별: `toBeTruthy`, `toBeFalsy`: 각각 `true`, `false` 
+- 대소 비교: `toBeGreaterThan`, `toBeGreaterThanOrEqual`, `toBeLessThan`, `toBeLessThanOrEqual`
+- 문자열, 정규식; `toMatch`
+- 반복가능자: `toContain`
+- 예외, 오류 발생 여부: `toThrow`
+- 그밖의 `expect` 요소: [API docs](https://jestjs.io/docs/expect)
+### JSDoc - a markup language used for annotating JavaScript code files.
+- [공식 홈페이지](https://jsdoc.app/)
+- JavaScript 코드에서 입출력 타입 정보를 관리하는 문서화 기능
+#### 백문불여일견
+
+```js
+/** 아래 함수에 대한 설명 */
+function foo() {
+
+}
+
+/** 
+ * 한 권의 책
+ * @constructor
+*/
+function Book(title, author) {
+}
+
+/** 
+ * 한 권의 책
+ * @constructor
+ * @param {string} title - 제목
+ * @param {string} author - 저자
+*/
+function Book(title, author) {
+}
+```
+- `/** */` 사이에 텍스트와 태그(`@태그명`)를 곁들여 코드에 대한 여러 가지 부가정보를 제공
+- `@param`, `@returns` 등 입출력 변수에 `{type}` 명시
+
+위와 같이 설명을 첨가한 파일에 대해 아래의 명령어를 실행하면, `out/` 경로에 HTML 페이지를 자동으로 생성
+```
+jsdoc book.js
+```
 
 # AWS Cloud Computing
 ## AWS Batch
@@ -429,3 +862,6 @@ m h     dom mon dow      commands
 ### git show
 - `git show <commit id>`: 해당 커밋의 변경 내용 자세히 보여주기
 - `--stat`: 변경 내용 요약한 수치
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbMTcyNDUxMzU0MCwtMTExMzc0MjIyM119
+-->
