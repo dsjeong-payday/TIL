@@ -555,10 +555,98 @@ for user in users:
 - `git` 프로젝트일 경우 `.gitignore`에 `.env` 추가하여 보안상 민감한 설정값을 원격 저장소에 올라가지 않게 하자.
 
 ## JavaScript
+### Syntax
+#### 화살표 함수
+기존의 함수 표현식에 비해 간결함
 
-### 표준 기능
-#### Array
-##### filter()
+- `this`, `arguments`, `super`에 대한 바인딩을 갖지 않으며, methods로 쓰일 수 없음
+- constructor로 쓰일 수 없음 -> `new`에 던지면 `TypeError` 반환. `new.target` 키워드에 접근 권한 없음
+- 표현식에 `yield`를 사용할 수 없고, 제너레이터 함수로서 만들어질 수도 없음.
+```js
+() => expression
+
+param => expression
+
+(param) => expression
+
+(param1, paramN) => expression
+
+() => {
+  statements
+}
+
+param => {
+  statements
+}
+
+(param1, paramN) => {
+  statements
+}
+```
+나머지 인수, 기본값 인수, destructuring 지원
+```js
+(a, b, ...r) => expression
+(a = 400, b = 20, c) => expression
+([a, b] = [10, 20]) => expression
+({ a, b } = { a: 10, b: 20 }) => expression
+```
+`async`와 함께 쓸 때:
+```js
+async param => expression
+async (param1, param2, ...paramN) => {
+  statements
+}
+```
+
+### [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)
+원시형(primitive*)이 아님. 즉 `Array`라는 클래스로서 메소드나 속성을 갖는다.
+*primitive: object가 아닌 자료형으로서, 메소드나 속성 또한 갖지 않는다. `string`, `number`, `bigint`, `boolean`, `undefined`, `symbol`, `null`
+
+`Array` 객체의 핵심적인 특성
+- resizable & type-mix of elements: 원소를 추가/제거할 수 있고 서로 다른 자료형의 원소를 담을 수도 있음. (<-> [typed arrays](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Typed_arrays))
+- not associative: 음이 아닌 정수만을 index로 사용할 수 있음
+- zero-indexed: 첫번째 원소의 index=0, 두번째는 1, ..., 맨 마지막 원소는 `Array.length - 1`
+- 모든 배열-복사 기능은 `shallow copy`** 만듦
+
+**shallow copy: 어느 객체의 `shallow copy`는 그 속성이 원본 객체의 속성과 동일한 참조를 공유한다. 즉 원본 객체의 속성값이 바라보는 곳과 복사본 객체의 속성값이 바라보는 곳이 동일하다. 이 때 둘 중 어느 하나의 속성값을 변경할 경우, 두 객체 모두 값이 달라진 것처럼 보인다. 이와 달리 `deep copy`는 원본과 독립적인 복사본 객체를 만들어낸다.
+
+#### 인덱스: `배열명[]`
+sparse arrays: 공란(empty slots)을 포함한 배열
+길이는 n인데 실제 값이 있는 원소는 n개 미만인 경우
+
+#### 여러 가지 `Array` 메소드
+-   [`concat()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/concat)
+-   [`copyWithin()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/copyWithin)
+-   [`every()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every)
+-   [`filter()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
+-   [`flat()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flat)
+-   [`flatMap()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap)
+-   [`forEach()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach)
+-   [`indexOf()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf)
+-   [`lastIndexOf()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/lastIndexOf)
+-   [`map()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
+-   [`reduce()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce)
+-   [`reduceRight()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduceRight)
+-   [`reverse()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reverse)
+-   [`slice()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice)
+-   [`some()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)
+-   [`sort()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort)
+-   [`splice()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice)
+아래부터는 empty slot을  `undefined`로 처리하는 젊은 메소드.
+-   [`entries()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/entries)
+-   [`fill()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/fill)
+-   [`find()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
+-   [`findIndex()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)
+-   [`findLast()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLast)
+-   [`findLastIndex()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLastIndex)
+-   [`group()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/group)  Experimental
+-   [`groupToMap()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/groupToMap)  Experimental
+-   [`includes()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/includes)
+-   [`join()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/join)
+-   [`keys()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/keys)
+-   [`toLocaleString()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/toLocaleString)
+-   [`values()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/values)
+#### filter()
 주어진 배열의 `shallow copy`를 만들고, 조건을 만족하는 요소만 추려서 새로운 배열을 반환한다. 새로운 배열을 반환하기 때문에, `shallow copy`된 원본 배열은 영향을 받지 않는다.
 ```js
 const words = ['spray', 'limit', 'elite', 'exuberant', 'destruction', 'present'];
