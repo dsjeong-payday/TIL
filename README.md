@@ -845,5 +845,5 @@ m h     dom mon dow      commands
 - `git show <commit id>`: 해당 커밋의 변경 내용 자세히 보여주기
 - `--stat`: 변경 내용 요약한 수치
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTcyNDUxMzU0MCwtMTExMzc0MjIyM119
+eyJoaXN0b3J5IjpbMTA1NTYyMTI0NCwtMTExMzc0MjIyM119
 -->
