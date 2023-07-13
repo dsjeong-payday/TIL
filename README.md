@@ -523,6 +523,49 @@ first_handler.handle_request()
 
 # 프로그래밍 언어
 ## Python
+
+### subprocess module - 자녀 프로세스 실행 및 관리
+> subprocess 모듈은 새로운 프로세스를 생성하고, 그들의 입력/출력/에러 파이프에 연결하고, 반환 코드를 얻을 수 있도록 합니다.
+- `run()`: 자녀 프로세스 실행하고 종료될 때까지 대기. 처리할 수 있는 모든 사례에 `run()`으로 해결할 것.
+- `Popen()`: `run()`의 하부(low-level) 인터페이스.
+
+#### 기본적인 사용법
+```python
+import subprocess
+
+subprocess.run(["ls", "-l"])
+
+# 표준 출력(stdout)과 표준 에러(stderr) 캡처됨
+subprocess.run(["ls", "-l", "/dev/null"], capture_output=True)  
+```
+- (참고) Python `subprocess`로 Python 앱을 실행시키는 것은 가능하긴 하지만 넌센스일 수도 있음. 하위 프로세스에서 실행할 특별한 이유가 있다면?
+#### `CompletedProcess`: `run()` 종료 후 반환되는 인스턴스
+    ```python
+    import subprocess
+
+    completed_process = subprocess.run(["ls", "-l"])
+    completed_process.returncode
+    # 0
+    ```
+- `check=True` 인자: 하위 프로세스가 실패할 경우 예외를 발생시킴. 기본값 `False`로서, 프로그램이 실패하면 반환값만 받아올 뿐 예외를 일으키진 않는다.
+#### 예외
+- `CalledProcessError`
+- `TimeoutExpired`
+- `FileNotFoundError`
+```python
+import subprocess
+
+try:
+    subprocess.run(
+        ["python", "timer.py", "5"], timeout=10
+    )
+except FileNotFoundError as e:
+    print(f"파일을 찾을 수 없습니다.\n{e}")
+except subprocess.CalledProcessError as e:
+    print(f"프로그램이 비정상적으로 종료되었습니다. 반환코드: {e.returncode}.\n{e}")
+except subprocess.TimeoutExpired as e:
+    print(f"프로세스 타임아웃.\n{e}")
+```
 ### SQLAlchemy (ORM library)
 > a comprehensive set of tools for working with databases and Python
 
