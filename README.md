@@ -118,7 +118,171 @@ We are also tracking you from around the world for any issues when the app is in
 번역된 기사 제목: Police have come online to investigate the case.
 [global] Police have come online to investigate the case. But they say they are still awaiting an inquest into the deaths of two boys from gang violence, including 15-year-old Jody Bostak
 ```
+#### How do Transformers work?
+트랜스포머 작동 원리.
+- 트랜스포머 등장: Vaswani et al. (2017) [Attention is All You Need](https://arxiv.org/abs/1706.03762)
+- 주류 패밀리 3종: GPT(*auto-regressive*), BERT(*auto-encoding*), BART/T5(*sequence-to-sequence*)
+- self-supervised learning with large amount of raw texts
+- 언어 모델: 언어에 대한 통계학적인 이해도 높지만, 특정한 과업에는 취약할 수 있음.
+- *transfer learning*: 사전 학습된 언어 모델을 지도학습 방법으로 파인 튜닝함으로써 특정한 과업을 해결하는 모델로 조정하는 기법
+- 언어 모델 학습비용은 천문학적. 환경 부담...사전학습된 모델을 돌려쓰는 것이 효율적 (Hugging Face Model Hub mission)
 
+##### Encoder-Decoder
+Encoder: 입력값을 받아서 feature representation 만듦. understanding에 최적화
+Decoder: Encoder가 전달한 feature로부터 출력값 생성. generating에 최적화
+해결하고자 하는 문제에 따라서 독립적으로 활용할 수 있음 
+- **Encoder-only models**: 문장 분류, NER 등
+- **Decoder-only models**: 텍스트 생성 등
+- **Encoder-decoder models (sequence-to-sequence models)**: 번역, 요약 등
+
+##### Attention layers
+입력 텍스트 중에서 특정한 단어에 주목하도록 하는 레이어
+아래는 불어-영어 번역 문제에서 어텐션 레이어의 대략적인 역할
+> To put this into context, consider the task of translating text from English to French. Given the input “You like this course”, a translation model will need to also attend to the adjacent word “You” to get the proper translation for the word “like”, because in French the verb “like” is conjugated differently depending on the subject. The rest of the sentence, however, is not useful for the translation of that word. In the same vein, when translating “this” the model will also need to pay attention to the word “course”, because “this” translates differently depending on whether the associated noun is masculine or feminine. Again, the other words in the sentence will not matter for the translation of “this”. With more complex sentences (and more complex grammar rules), the model would need to pay special attention to words that might appear farther away in the sentence to properly translate each word.
+
+단어 자체도 의미를 갖지만, 그 의미는 문맥에 좌우
+자연어처리에서의 문맥이란 해당 단어의 앞뒤 단어로부터 추론
+
+##### Transformer's original architecture
+Transformer 모델의 당초 해결 목표는 번역이었음
+훈련 - encoder가 특정 언어의 입력값을 받고, decoder가 동일한 의미의 문장을 목표 언어로 받음.
+Encoder의 어텐션 레이어는 문장의 모든 단어를 사용할 수 있는 반면, decoder는 순차적으로 작동하며 이미 번역된 앞부분의 단어만을 주목할 수 있음.
+예) 세 번째 단어까지 생성한 상황에서 네 번째 단어의 예측은 encoder가 받은 전체 문장과 decoder가 생성한 세 단어를 활용함
+훈련 과정에서 decoder는 목표 언어의 문장을 통째로 투입받긴 하지만, 아직 도달하지 않은 부분까지는 추론에 활용할 수 없게 함.
+![Alt text](./imgs/transformers.svg "Transformer's original architecture")
+decoder의 첫 번째 어텐션 레이어는 decoder에 대한 입력값에 주목하지만, 두 번째 레이어는 encoder의 산출값을 활용함. 다음 번 단어를 예측할 떄마다 입력 문장의 전체 구조에 접근한다는 의미. 서로 다른 언어 사이의 문법적인 규칙을 반영할 수 있음
+그밖에 *attention mask*: padding과 같은 요소에 주목하지 않도록 할 수 있음.
+
+Model 용어
+- **architecture**: 모델의 뼈대. 신경망 내부의 레이어 구조와 연산 (예: BERT)
+- **checkpoints**: 가중치. 모델의 architecture에 탑재될 값들 (예: `bert-base-cased`)
+- **model**: 맥락에 따라 architecture를 가리킬 수도, checkpoints를 가리킬 수도 있음
+
+#### 요약
+| Model       | Examples    | Tasks       |
+| ----------- | ----------- | ----------- |
+| Encoder      | ALBERT, BERT, DistilBERT, ELECTRA, RoBERTa	| 문장분류, NER, Extractive 문답 |
+| Decoder   | CTRL, GPT, GPT-2, Transformer XL	        | 문장 생성 |
+| Encoder-Decoder   | BART, T5, Marian, mBART	        | 요약, 번역, Generative 문답 |
+### 2. Using Transformers
+#### Introduction
+Transformer 라이브러리 개발 취지: 여러 트랜스포머 모델을 간편하게 불러오고, 훈련하고, 저장할 수 있는 API 제공
+- **Ease of use**: Hub에 공개된 NLP 모델을 단 두 줄의 코드로 사용 가능
+- **Flexibility**: PyTorch `nn.Module` 혹은 TensorFlow `tf.keras.Model` 클래스로 제공
+- **Simplicity**: "All in one file". 모델을 하나의 파일로 활용하기. 코드가 단순해지기도 하고 모델끼리 분리되기도 함
+#### Behind the pipeline
+![Alt text](./imgs/full_nlp_pipeline.svg "Transformer's original architecture")
+##### Tokenizer: raw text를 자연어처리 모델이 다룰 수 있는 숫자로 바꾸는 역할 (토큰화)
+- 텍스트 입력값을 단어, subwords, 기호 등 *토큰*으로 쪼갬
+- 각각의 *토큰*을 어느 정수에 매핑
+- 모델에 유용한 입력값 추가
+
+`AutoTokenizer.from_pretrained('체크포인트명')`: 체크포인트로부터 tokenizer 인스턴스 생성
+```python
+from transformers import AutoTokenizer
+
+# 체크포인트 명시
+checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
+
+# 위의 체크포인트로부터 tokenizer 호출
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+
+# tokenizer에 투입할 입력값
+raw_inputs = [
+    "I've been waiting for a HuggingFace course my whole life.",
+    "I hate this so much!",
+]
+
+# inputs: 텍스트 입력값을 토큰화한 결과 -> 추후 모델의 입력값으로 투입될 예정
+inputs = tokenizer(raw_inputs, padding=True, truncation=True, return_tensors="pt")
+print(inputs)
+```
+아래는 위의 `raw_inputs`의 토큰화된 버전
+```
+{
+    'input_ids': tensor([
+        [  101,  1045,  1005,  2310,  2042,  3403,  2005,  1037, 17662, 12172, 2607,  2026,  2878,  2166,  1012,   102],
+        [  101,  1045,  5223,  2023,  2061,  2172,   999,   102,     0,     0,     0,     0,     0,     0,     0,     0]
+    ]), 
+    'attention_mask': tensor([
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+    ])
+}
+```
+`input_ids`: 두 개의 정수 리스트를 담은 `tensor`. 각각 리스트는 `raw_inputs`의 문장과 대응하며, 각각의 정수는 `token`의 식별자임.
+##### Model - `token` -> 고차원 벡터 -> head -> outputs
+`AutoModel.from_pretrained('체크포인트명')`: `token` 입력을 받아서 특정한 예측 과정 수행하는 모델.
+```python
+from transformers import AutoModel
+
+checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
+model = AutoModel.from_pretrained(checkpoint)
+```
+
+예제의 모델은 주어진 `token`에 대해 *hidden states* (혹은 *features*) 반환하는 구조. 여기서 *hidden states*는 **고차원 벡터**의 형태로 표현함. input -> contextual understanding by the Transformer model
+
+고차원 벡터의 형태를 구분짓는 3대 변수
+- **Batch size**: 한 번에 처리되는 시퀀스의 수
+- **Sequence length**: 시퀀스의 숫자 표현의 길이
+- **Hidden size**: 모델 입력값의 벡터 차원 크기(768에서 큰 모델은 3,072 이상)
+```python
+outputs = model(**inputs)
+print(outputs.last_hidden_state.shape)
+# => torch.Size([2, 16, 768])
+```
+
+Model Heads
+![Alt text](./imgs/transformer_and_head.svg "Transformer's original architecture")
+*Hidden states*를 입력값으로 받아서 다른 차원의 벡터로 반환하는 역할. 주로 한 개, 혹은 몇 개의 선형 레이어로 이루어짐. 언어와 맥락에 대한 추상적인 벡터로부터 모델을 통해 해결하고자 하는 문제에 적합한 형태로 변환하는 과정. 
+
+아래는 Transformer 라이브러리가 제공하는 아키텍처 예시:
+- *Model (retrieve the hidden states)
+- *ForCausalLM
+- *ForMaskedLM
+- *ForMultipleChoice
+- *ForQuestionAnswering
+- *ForSequenceClassification
+- *ForTokenClassification
+- and others 🤗
+
+문장분류 문제 예제
+```python
+from transformers import AutoModelForSequenceClassification
+
+checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
+outputs = model(**inputs)
+
+print(outputs.logits.shape)
+# => torch.Size([2, 2]) 2개의 문장과 2개의 label
+```
+##### Postprocessing the output
+2x2 출력값의 정체는 *logits* 값
+```python
+print(outputs.logits)
+# => tensor([[-1.5607,  1.6123],
+#            [ 4.1692, -3.3464]], grad_fn=<AddmmBackward>)
+```
+*logits* 함수 값을 0에서 1사이의 확률 값으로 변환하려면 SoftMax 레이어에 통과시켜야 함
+```python
+import torch
+
+predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
+print(predictions)
+# => tensor([[4.0195e-02, 9.5980e-01],
+#            [9.9946e-01, 5.4418e-04]], grad_fn=<SoftmaxBackward>)
+```
+첫 번째 문장에 대한 결과값은 [.0402, .9598]로서 두 번째 label에 대해 95.98%의 확률 반환. 두 번째 문장에 대한 결과값은 [.9995, .0005]. 각 label 명칭을 확인하고자 한다면, `model.config.id2label` 조회해볼 것
+```python
+print(model.config.id2label)
+# => {0: 'NEGATIVE', 1: 'POSITIVE'}
+```
+
+| 문장 | NEGATIVE(=0) | POSITIVE(=1) |
+| ------ | ------ | ------ |
+| (1) | .0402 | .9598 |
+| (2) | .9995 | .0005 |
 
 
 # Docker
