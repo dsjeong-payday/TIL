@@ -283,6 +283,127 @@ print(model.config.id2label)
 | ------ | ------ | ------ |
 | (1) | .0402 | .9598 |
 | (2) | .9995 | .0005 |
+#### Models
+`AutoModel` 클래스: transformer 라이브러리의 다양한 모델의 wrapper
+##### Creating a Transformer
+`BERT` 모델 초기화하기
+```python
+from transformers import BertConfig, BertModel
+
+# Building the config
+config = BertConfig()
+
+# Building the model from the config
+model = BertModel(config)
+
+# 설정 확인
+print(config)
+
+#BertConfig {
+#  [...]
+#  "hidden_size": 768,
+#  "intermediate_size": 3072,
+#  "max_position_embeddings": 512,
+#  "num_attention_heads": 12,
+#  "num_hidden_layers": 12,
+#  [...]
+#}
+```
+##### 모델을 불러오는 다른 방법 (pre-trained)
+위의 코드는 `BERT` 모델을 불러와 초기화하므로 새로 훈련시켜야 함.
+아래는 이미 훈련된 모델을 불러오는 코드.
+```python
+from transformers import BertModel
+
+model = BertModel.from_pretrained("bert-base-cased")
+# (바로 윗줄과 동일) model = AutoModel.from_pretrained("bert-base-cased")
+```
+`from_pretrained("모델명")` 명시된 모델(=check-point)을 불러와 model 객체 생성함.
+모델에 대한 상세한 정보는 Hugging Face Model Hub에서 모델 카드 확인해보기.
+추가적인 훈련 데이터를 제공함으로써 훈련되지 않은 task에 대해서 fine-tune 할 수 있음.
+`from_pretrained()` 메소드를 통해 다운로드 받은 모델은 다음 경로에 캐싱됨. `~/.cache/huggingface/transformers`
+##### Saving methods 모델 저장하기
+```python
+model.save_pretrained("저장할 경로")
+```
+```shell
+ls directory_on_my_computer
+
+config.json pytorch_model.bin
+```
+- *config.json*: 모델 속성값, 설정값, 메타 데이터, '모델 아키텍처'
+- *pytorch_model.bin*: 모델의 모든 가중치. *state dictionary*라고도 불림
+##### Using a Transformer model for inference 모델 추론시키기
+##### Using the tensors as inputs to the model
+```python
+import torch
+
+sequences = ["Hello!", "Cool.", "Nice!"]
+encoded_sequences = [
+    [101, 7592, 999, 102],
+    [101, 4658, 1012, 102],
+    [101, 3835, 999, 102],
+]
+
+model_inputs = torch.tensor(encoded_sequences)
+
+output = model(model_inputs)
+
+```
+
+#### Tokenizers
+토큰화: text -> number. 모델이 가장 잘 받아들일 수 있는 numeric representation. 가능하면 smaller representation.
+##### Word-based
+공백이나 punctuation 기준으로 단어를 나눔
+유사한 단어(동사, 동사-ing, 동사-ization 등)가 유사한 의미인지 아닌지 모델은 알 수 없음. 이마저도 훈련의 대상임
+unknown token: 어휘 목록에 없는 단어를 나타내는 custom token "[UNK]" 혹은 ""
+##### Character-based
+알파벳 문자 단위로 쪼갬
+어휘의 크기나 unknown token의 수가 현저히 적지만, 각각의 문자가 지니는 의미가 약함 (중국어와 같은 문자는 그렇지 않음)
+단어 기반 토크나이저보다 토큰의 수가 많아지기도 함
+##### Subword tokenization
+word-based와 character-based의 혼합으로서, 자주 쓰이는 단어는 쪼개지 않고 덜 쓰이는 부사 등의 어미는 쪼갬. 그밖에...
+- Byte-level BPE, as used in GPT-2
+- WordPiece, as used in BERT
+- SentencePiece or Unigram, as used in several multilingual models
+##### Loading and saving
+`AutoTokenizer`: 토크나이저(model의 architecture 역할)와 어휘(model의 weight 역할) 모음
+    - `from_pretrained("토크나이저 이름")`: 허브에 게시된 토크나이저 불러오기
+    - `save_pretrained("토크나이저 저장할 경로")`: 토크나이저 객체를 컴퓨터에 저장
+##### Encoding - text -> number
+Encoding two-step: 토큰화 -> input IDs로 변환
+(1) 입력 텍스트를 여러 토큰으로 분리함.
+뒤에 사용할 모델과 동일한 명칭의 토크나이저 사용해야 함
+(2) 모델에 투입할 형태인 input ID로 변환. 토큰-어휘 연결
+**subword tokenizer 예시**
+(1) 토큰화
+```python
+from transformers import AutoTokenizer
+
+# 토크나이저 객체
+tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+
+# 입력 텍스트
+sequence = "Using a Transformer network is simple"
+tokens = tokenizer.tokenize(sequence)
+
+print(tokens)
+# ['Using', 'a', 'transform', '##er', 'network', 'is', 'simple']
+```
+(2) 토큰 -> input IDs
+```python
+ids = tokenizer.convert_tokens_to_ids(tokens)
+
+print(ids)
+# [7993, 170, 11303, 1200, 2443, 1110, 3014]
+```
+##### Decoding - number -> text
+```python
+decoded_string = tokenizer.decode([7993, 170, 11303, 1200, 2443, 1110, 3014])
+print(decoded_string)
+'Using a Transformer network is simple'
+```
+놀랍게도 `'##er'` 토큰을 `'transform'` 토큰에 이어붙여서 보여줌.
 
 
 # Docker
