@@ -404,7 +404,184 @@ print(decoded_string)
 'Using a Transformer network is simple'
 ```
 놀랍게도 `'##er'` 토큰을 `'transform'` 토큰에 이어붙여서 보여줌.
+#### Handling multiple sequences
+##### Models expect a batch of inputs
+```python
+import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
+checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
+
+sequence = "I've been waiting for a HuggingFace course my whole life."
+
+tokens = tokenizer.tokenize(sequence)
+ids = tokenizer.convert_tokens_to_ids(tokens)
+input_ids = torch.tensor(ids)
+
+# This line will fail.
+model(input_ids)
+
+# IndexError: Dimension out of range (expected to be in range of [-1, 0], but got 1)
+```
+모델의 투입으로서 `input_ids`는 여러 문장이 들어가야 하지만, 위의 코드에서는 단일 문장임. 하나의 문장은 토큰 ids의 리스트인데, 여러 문장은 list of lists. 따라서 `input_ids`는 `[[문장1], [문장2], ...]`의 형태로 투입해야 함
+
+```python
+import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
+
+sequence = "I've been waiting for a HuggingFace course my whole life."
+
+tokens = tokenizer.tokenize(sequence)
+ids = tokenizer.convert_tokens_to_ids(tokens)
+
+# torch.tensor(ids) 에서 수정
+input_ids = torch.tensor([ids])  # 리스트로 감싼 후 tensor로 반환
+print("Input IDs:", input_ids)
+# Input IDs: [[ 1045,  1005,  2310,  2042,  3403,  2005,  1037, 17662, 12172,  2607, 2026,  2878,  2166,  1012]]
+
+output = model(input_ids)
+print("Logits:", output.logits)
+# Logits: [[-2.7276,  2.8789]]
+```
+*Batching*이란 여러 개의 문장을 모델에 한꺼번에 넣는 행위. 단 하나의 문장을 넣더라도 batch 형태로 넣어야 함. 
+```python
+batched_ids = [ids, ids]
+batched_inputs = torch.tensor(batched_ids)  # 혹은 torch.tensor([ids, ids])
+
+output_from_batch = model(batched_inputs)
+print("Logits:", output_from_batch.logits)
+# Logits:  tensor([[-2.7276,  2.8789],
+#                  [-2.7276,  2.8789]], grad_fn=<AddmmBackward0>)
+```
+##### Padding the inputs
+입력할 문장의 길이가 서로 다른 경우에는 어떻게 한꺼번에 투입할까? *Padding* 처리를 통해 입력 tensor를 정사각형 형태로 전처리해야 한다. 길이가 가장 긴 문장을 기준으로 나머지 짧은 문장에 *padding token*을 추가한다. 해당 모델의 *padding token*의 id 값은 `tokenizer.pad_token_id` 확인해보기. 
+
+```python
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
+
+sequence1_ids = [[200, 200, 200]]
+sequence2_ids = [[200, 200]]
+batched_ids = [
+    [200, 200, 200],
+    [200, 200, tokenizer.pad_token_id],
+]
+
+print(model(torch.tensor(sequence1_ids)).logits)
+# tensor([[ 1.5694, -1.3895]], grad_fn=<AddmmBackward>)
+
+print(model(torch.tensor(sequence2_ids)).logits)
+# tensor([[ 0.5803, -0.4125]], grad_fn=<AddmmBackward>)
+
+print(model(torch.tensor(batched_ids)).logits)
+# tensor([[ 1.5694, -1.3895],
+#         [ 1.3373, -1.2163]], grad_fn=<AddmmBackward>)
+```
+두 번째 문장에 대한 예측값은 *padding*을 넣지 않았을 때와 넣었을 때 서로 다른 값으로 나타난다. *padding*으로 추가된 token도 추론에 반영되었기 때문이다. 이를 방지하기 위해 *attention masks*가 필요하다.
+##### Attention masks
+```python
+batched_ids = [
+    [200, 200, 200],
+    [200, 200, tokenizer.pad_token_id],
+]
+
+# 입력값 중에서 유의미한 token과 padding token을 각각 1과 0으로 구분하는 마스크 배열
+attention_mask = [
+    [1, 1, 1],
+    [1, 1, 0],
+]
+
+outputs = model(torch.tensor(batched_ids), attention_mask=torch.tensor(attention_mask))
+print(outputs.logits)
+# tensor([[ 1.5694, -1.3895],
+#         [ 0.5803, -0.4125]], grad_fn=<AddmmBackward>)
+```
+##### Longer sequences
+모델에 따라 입력 token 개수의 상한 있음. 더욱 긴 문장을 지원하는 모델을 사용하거나, 입력 문장을 잘라서 투입하기. [**Longformer**](https://huggingface.co/transformers/model_doc/longformer.html), [**LED**](https://huggingface.co/transformers/model_doc/led.html) 등과 같이 매우 긴 문장을 다루는 데에 특화된 것도 있음.
+문장을 잘라서 투입할 때엔 `max_sequence_length` 보다 작은 크기로 자르면 됨.
+```python
+sequence = sequence[:max_sequence_length]
+```
+#### Putting it all together
+앞서 살펴본 내용은 Hugging Face Transformers API에 의해 고수준 함수로 지원됨.
+```python
+from transformers import AutoTokenizer
+
+checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+
+sequence = "I've been waiting for a HuggingFace course my whole life."
+
+model_inputs = tokenizer(sequence)
+```
+`tokenizer` 메소드는 `model_inputs`을 반환하는데, 해당 checkpoint 모델에 바로 투입 가능한 형태와 정보를 갖추고 있음. 아래와 같이 여러 가지 *padding* 옵션이나 길이 제한, 문장 자르기(truncate) 등의 동작도 설정 가능.
+```python
+# Will pad the sequences up to the maximum sequence length
+model_inputs = tokenizer(sequences, padding="longest")
+
+# Will pad the sequences up to the model max length
+# (512 for BERT or DistilBERT)
+model_inputs = tokenizer(sequences, padding="max_length")
+
+# Will pad the sequences up to the specified max length
+model_inputs = tokenizer(sequences, padding="max_length", max_length=8)
+
+sequences = ["I've been waiting for a HuggingFace course my whole life.", "So have I!"]
+
+# Will truncate the sequences that are longer than the model max length
+# (512 for BERT or DistilBERT)
+model_inputs = tokenizer(sequences, truncation=True)
+
+# Will truncate the sequences that are longer than the specified max length
+model_inputs = tokenizer(sequences, max_length=8, truncation=True)
+```
+`tokenizer`로부터 여러 프레임워크(PyTorch, TensorFlow, NumPy)에 호환되는 형태로 반환할 수도 있음.
+```python
+sequences = ["I've been waiting for a HuggingFace course my whole life.", "So have I!"]
+
+# Returns PyTorch tensors
+model_inputs = tokenizer(sequences, padding=True, return_tensors="pt")
+
+# Returns TensorFlow tensors
+model_inputs = tokenizer(sequences, padding=True, return_tensors="tf")
+
+# Returns NumPy arrays
+model_inputs = tokenizer(sequences, padding=True, return_tensors="np")
+```
+##### Special tokens
+```python
+sequence = "I've been waiting for a HuggingFace course my whole life."
+
+model_inputs = tokenizer(sequence)
+print(model_inputs["input_ids"])
+# [101, 1045, 1005, 2310, 2042, 3403, 2005, 1037, 17662, 12172, 2607, 2026, 2878, 2166, 1012, 102]
+
+tokens = tokenizer.tokenize(sequence)
+ids = tokenizer.convert_tokens_to_ids(tokens)
+print(ids)
+# [1045, 1005, 2310, 2042, 3403, 2005, 1037, 17662, 12172, 2607, 2026, 2878, 2166, 1012]
+```
+위의 코드에서 `tokenizer`가 반환한 리스트는 ids와 달리 맨 앞과 끝에 `101`, `102` 토큰이 추가되어 있음. 이들은 special token으로서 각각 문장의 시작과 끝인 `[CLS]`, `[SEP]`로 디코딩 됨. Special token은 모델에 따라 다르며 있을 수도 있고 없을 수도 있음.
+##### Wrapping up: From tokenizer to model
+정리하자면 이번 장에서 다룬 여러 가지 세부 과정은 `tokenizer` 메소드로 편리하게 처리 가능.
+```python
+import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+
+checkpoint = "distilbert-base-uncased-finetuned-sst-2-english"
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
+sequences = ["I've been waiting for a HuggingFace course my whole life.", "So have I!"]
+
+tokens = tokenizer(sequences, padding=True, truncation=True, return_tensors="pt")
+output = model(**tokens)
+```
+참고로 `tokenizer` 메소드는 객체 자체를 호출하고 있는데, Python 클래스의 `__call__` 메소드를 정의한 것임.
 
 # Docker
 ## Docker Desktop Tutorial
