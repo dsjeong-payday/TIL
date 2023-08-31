@@ -583,6 +583,168 @@ output = model(**tokens)
 ```
 참고로 `tokenizer` 메소드는 객체 자체를 호출하고 있는데, Python 클래스의 `__call__` 메소드를 정의한 것임.
 
+### 3. FINE-TUNING A PRETRAINED MODEL
+#### Processing the data
+아래는 checkpoint 모델에 추가적으로 문장을 훈련시킨 코드.
+```python
+import torch
+from transformers import AdamW, AutoTokenizer, AutoModelForSequenceClassification
+
+# Same as before
+checkpoint = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
+sequences = [
+    "I've been waiting for a HuggingFace course my whole life.",
+    "This course is amazing!",
+]
+batch = tokenizer(sequences, padding=True, truncation=True, return_tensors="pt")
+
+# This is new
+batch["labels"] = torch.tensor([1, 1])
+
+optimizer = AdamW(model.parameters())
+loss = model(**batch).loss
+loss.backward()
+optimizer.step()
+```
+##### Loading a dataset from the Hub
+- [HF 데이터셋 허브](https://huggingface.co/datasets)
+- HF 데이터셋 라이브러리 `datasets`
+```python
+from datasets import load_dataset
+
+raw_datasets = load_dataset("glue", "mrpc")
+raw_datasets
+
+# DatasetDict({
+#     train: Dataset({
+#         features: ['sentence1', 'sentence2', 'label', 'idx'],
+#         num_rows: 3668
+#     })
+#     validation: Dataset({
+#         features: ['sentence1', 'sentence2', 'label', 'idx'],
+#         num_rows: 408
+#     })
+#     test: Dataset({
+#         features: ['sentence1', 'sentence2', 'label', 'idx'],
+#         num_rows: 1725
+#     })
+# })
+```
+`~/.cache/huggingface/datasets` 경로에 데이터셋 캐싱함
+```python
+raw_train_dataset = raw_datasets["train"]
+raw_train_dataset[0]
+
+# {'idx': 0,
+#  'label': 1,
+#  'sentence1': 'Amrozi accused his brother , whom he called " the witness " , of deliberately distorting his evidence .',
+#  'sentence2': 'Referring to him as only " the witness " , Amrozi accused his brother of deliberately distorting his evidence .'}
+```
+#### Processing the data
+##### Preprocessing a dataset
+토크나이저: 문자열을 여러 토큰으로 분해, 각 토큰은 정수에 할당
+```python
+from transformers import AutoTokenizer
+
+checkpoint = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+tokenized_sentences_1 = tokenizer(raw_datasets["train"]["sentence1"])
+tokenized_sentences_2 = tokenizer(raw_datasets["train"]["sentence2"])
+```
+두 문장을 쌍으로 처리
+```python
+inputs = tokenizer("This is the first sentence.", "This is the second one.")
+inputs
+
+# { 
+#   'input_ids': [101, 2023, 2003, 1996, 2034, 6251, 1012, 102, 2023, 2003, 1996, 2117, 2028, 1012, 102],
+#   'token_type_ids': [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1],
+#   'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+# }
+```
+`token_type_ids`: 각각의 토큰이 몇 번째 문장에 속한 것인지 구분
+```python
+tokenizer.convert_ids_to_tokens(inputs["input_ids"])
+
+# ['[CLS]', 'this', 'is', 'the', 'first', 'sentence', '.', '[SEP]', 'this', 'is', 'the', 'second', 'one', '.', '[SEP]']
+# [      0,      0,    0,     0,       0,          0,   0,       0,      1,    1,     1,        1,     1,   1,       1]
+```
+`Dataset.map()`: 특정 함수를 데이터셋의 각 요소에 적용. 예시)
+```python
+def tokenize_function(example):
+    return tokenizer(example["sentence1"], example["sentence2"], truncation=True)
+```
+이때 `padding` 인자를 생략했는데, 모든 문장에 `padding` 최대 길이를 적용하는 것은 비효율적이기 때문. 대신에 배치를 만들 때 해당 배치의 길이에 맞추어 패딩하는 것이 낫다.
+
+```python
+tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
+tokenized_datasets
+
+# DatasetDict({
+#     train: Dataset({
+#         features: ['attention_mask', 'idx', 'input_ids', 'label', 'sentence1', 'sentence2', 'token_type_ids'],
+#         num_rows: 3668
+#     })
+#     validation: Dataset({
+#         features: ['attention_mask', 'idx', 'input_ids', 'label', 'sentence1', 'sentence2', 'token_type_ids'],
+#         num_rows: 408
+#     })
+#     test: Dataset({
+#         features: ['attention_mask', 'idx', 'input_ids', 'label', 'sentence1', 'sentence2', 'token_type_ids'],
+#         num_rows: 1725
+#     })
+# })
+```
+`map()` 함수를 호출할 때, `num_proc` 인자를 넣으면 멀티 프로세싱 가능. 다만 위의 코드에 쓰인 `HuggingFace tokenizer` 라이브러리는 백엔드에 Rust를 사용하며 기본적으로 멀티 프로세싱을 지원함.
+
+
+##### Dynamic padding
+*collate function*: 여러 샘플을 하나의 배치에 넣는 함수. (collate: collect and combine in the correct order.) `DataLoader`의 인자로 전달 가능. 
+`DataCollatorWithPadding`: 배치에 투입할 샘플을 동일한 크기로 제공해야 할 때, 각각의 항목에 맞는 패딩을 입히는 함수.
+```python
+from transformers import DataCollatorWithPadding
+
+data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+```
+동적 패딩: 아래와 같이 8개 문장을 하나의 배치로 넣을 때 모든 샘플의 길이를 배치 내 최대값(=67)과 동일하게끔 패딩하기. 이와 달리 동적 패딩이 없으면 전체 샘플의 최대 길이나 모델이 받아들일 수 있는 최대값에 맞추어 패딩하게 됨.
+
+```python
+samples = tokenized_datasets["train"][:8]
+samples = {k: v for k, v in samples.items() if k not in ["idx", "sentence1", "sentence2"]}
+[len(x) for x in samples["input_ids"]]
+# [50, 59, 47, 67, 59, 50, 62, 32]
+```
+위에서 정의한 `data_collator`도 마찬가지로 동적 패딩을 적용하고 있음.
+```python
+batch = data_collator(samples)
+{k: v.shape for k, v in batch.items()}
+
+# {'attention_mask': torch.Size([8, 67]),
+#  'input_ids': torch.Size([8, 67]),
+#  'token_type_ids': torch.Size([8, 67]),
+#  'labels': torch.Size([8])}
+```
+#### Fine-tuning a model with the Trainer API
+`Trainer` 클래스: 사전 학습된 모델을 추가 학습.
+```python
+from datasets import load_dataset
+from transformers import AutoTokenizer, DataCollatorWithPadding
+
+raw_datasets = load_dataset("glue", "mrpc")
+checkpoint = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(checkpoint)
+
+
+def tokenize_function(example):
+    return tokenizer(example["sentence1"], example["sentence2"], truncation=True)
+
+
+tokenized_datasets = raw_datasets.map(tokenize_function, batched=True)
+data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+```
+
 # Docker
 ## Docker Desktop Tutorial
 ### What is a container?
